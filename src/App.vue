@@ -1,6 +1,5 @@
 <template>
   <div class="app">
-    <router-link to="/">测试路由</router-link>
     <router-view></router-view>
   </div>
 </template>
@@ -9,4 +8,9 @@
 export default {};
 </script>
 
-<style></style>
+<style>
+@import url(~@/style/base.css);
+.app {
+  height: 100%;
+}
+</style>
