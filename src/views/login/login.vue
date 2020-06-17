@@ -25,7 +25,7 @@
               <el-input v-model="form.code" prefix-icon="el-icon-key" placeholder="请输入验证码"></el-input>
             </el-col>
             <el-col :span="8">
-              <img class="code" src="http://127.0.0.1/heimamm/public/captcha?type=login" alt />
+              <img class="code" :src="codeUrl" alt />
             </el-col>
           </el-row>
         </el-form-item>
@@ -37,22 +37,29 @@
           </el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-button @click=" toLogin()" class="btn" type="primary">登录</el-button>
+          <el-button @click="toLogin" class="btn" type="primary">登录</el-button>
           <br />
-          <el-button class="btn" type="primary">注册</el-button>
+          <el-button @click="$refs.register.isShow = true" class="btn" type="primary">注册</el-button>
         </el-form-item>
       </el-form>
     </div>
     <div class="right">
       <img src="@/assets/img/login_banner_ele.png" alt />
     </div>
+    <!-- 对话框 -->
+    <register ref="register"></register>
   </div>
 </template>
 
 <script>
+import register from "./register";
 export default {
+  components: {
+    register
+  },
   data() {
     return {
+      codeUrl: process.env.VUE_APP_URL + "/captcha?type=login",
       form: {
         phone: "", // 手机号
         password: "", // 密码
