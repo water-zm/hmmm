@@ -2,20 +2,65 @@
   <div class="login">
     <div class="left">
       <div class="top">
-        <img class="logo" src="@/assets/img/login_logo.png" alt="" />
+        <img class="logo" src="@/assets/img/login_logo.png" alt />
         <span class="t1">黑马面面</span>
         <div class="line"></div>
         <span class="t2">用户登录</span>
       </div>
+      <el-form class="form" :model="form">
+        <el-form-item>
+          <el-input v-model="form.phone" prefix-icon="el-icon-user" placeholder="请输入手机号"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-input
+            v-model="form.password"
+            show-password
+            prefix-icon="el-icon-lock"
+            placeholder="请输入密码"
+          ></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-row>
+            <el-col :span="16">
+              <el-input v-model="form.code" prefix-icon="el-icon-key" placeholder="请输入验证码"></el-input>
+            </el-col>
+            <el-col :span="8">
+              <img class="code" src="http://127.0.0.1/heimamm/public/captcha?type=login" alt />
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <el-form-item>
+          <el-checkbox v-model="form.isCheck">
+            我已阅读并同意
+            <el-link type="primary">用户协议</el-link>和
+            <el-link type="primary">隐私条款</el-link>
+          </el-checkbox>
+        </el-form-item>
+        <el-form-item>
+          <el-button class="btn" type="primary">登录</el-button>
+          <br />
+          <el-button class="btn" type="primary">注册</el-button>
+        </el-form-item>
+      </el-form>
     </div>
     <div class="right">
-      <img src="@/assets/img/login_banner_ele.png" alt="" />
+      <img src="@/assets/img/login_banner_ele.png" alt />
     </div>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      form: {
+        phone: "", // 手机号
+        password: "", // 密码
+        isCheck: false // 选择状态
+      }
+    };
+  }
+};
 </script>
 
 <style lang="less">
@@ -38,6 +83,7 @@ export default {};
     .top {
       display: flex;
       align-items: center;
+      margin-bottom: 28px;
       .logo {
         width: 22px;
         height: 17px;
@@ -56,6 +102,24 @@ export default {};
       .t2 {
         font: 400 22px PingFangSC;
         color: rgba(13, 12, 12, 1);
+      }
+    }
+    .form {
+      .el-input__inner {
+        height: 45px;
+      }
+      .el-form-item {
+        margin-bottom: 25px;
+      }
+      .code {
+        width: 100%;
+        height: 45px;
+      }
+      .btn {
+        width: 100%;
+        &:nth-child(1) {
+          margin-bottom: 25px;
+        }
       }
     }
   }
