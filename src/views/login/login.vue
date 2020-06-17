@@ -7,11 +7,11 @@
         <div class="line"></div>
         <span class="t2">用户登录</span>
       </div>
-      <el-form class="form" :model="form">
-        <el-form-item>
+      <el-form class="form" :model="form" :rules="rules" ref="form">
+        <el-form-item prop="phone">
           <el-input v-model="form.phone" prefix-icon="el-icon-user" placeholder="请输入手机号"></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="password">
           <el-input
             v-model="form.password"
             show-password
@@ -19,7 +19,7 @@
             placeholder="请输入密码"
           ></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="code">
           <el-row>
             <el-col :span="16">
               <el-input v-model="form.code" prefix-icon="el-icon-key" placeholder="请输入验证码"></el-input>
@@ -29,7 +29,7 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="isCheck">
           <el-checkbox v-model="form.isCheck">
             我已阅读并同意
             <el-link type="primary">用户协议</el-link>和
@@ -37,7 +37,7 @@
           </el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-button class="btn" type="primary">登录</el-button>
+          <el-button @click=" toLogin()" class="btn" type="primary">登录</el-button>
           <br />
           <el-button class="btn" type="primary">注册</el-button>
         </el-form-item>
@@ -56,9 +56,35 @@ export default {
       form: {
         phone: "", // 手机号
         password: "", // 密码
+        code: "", //验证码
         isCheck: false // 选择状态
+      },
+      rules: {
+        phone: [
+          { required: true, message: "请输入手机号", trigger: "change" },
+          { min: 11, max: 11, message: "请输入正确的手机号", trigger: "change" }
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "change" },
+          { min: 6, max: 12, message: "请输入6-12位密码", trigger: "change" }
+        ],
+        code: [
+          { required: true, message: "请输入验证码", trigger: "change" },
+          { min: 4, max: 4, message: "请输入4位密码", trigger: "change" }
+        ],
+        isCheck: [{ required: true, message: "请勾选选项", trigger: "change" }]
       }
     };
+  },
+  methods: {
+    toLogin() {
+      this.$refs.form.validate(result => {
+        window.console.log(result);
+        if (!result) {
+          this.$message.error("错了哦，这是一条错误消息");
+        }
+      });
+    }
   }
 };
 </script>
