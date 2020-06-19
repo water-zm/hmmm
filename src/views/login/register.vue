@@ -1,12 +1,17 @@
 <template>
-  <el-dialog :visible="isShow" width="600px" class="register" :show-close="false">
+  <el-dialog
+    :visible="isShow"
+    width="600px"
+    class="register"
+    :show-close="false"
+  >
     <div slot="title" class="title">用户注册</div>
     <el-form :model="form" :rules="rules" label-width="80px" ref="form">
       <el-form-item label="头像" prop="avatar">
         <el-upload
           name="image"
           class="avatar-uploader"
-          :action="baseUrl+'/uploads'"
+          :action="baseUrl + '/uploads'"
           :show-file-list="false"
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
@@ -16,103 +21,191 @@
         </el-upload>
       </el-form-item>
       <el-form-item label="昵称" prop="username">
-        <el-input v-model="form.username"></el-input>
+        <el-input v-model="form.username" placeholder="请输入昵称"></el-input>
       </el-form-item>
       <el-form-item label="邮箱" prop="email">
-        <el-input v-model="form.email"></el-input>
+        <el-input v-model="form.email" placeholder="请输入邮箱"></el-input>
       </el-form-item>
       <el-form-item label="手机" prop="phone">
-        <el-input v-model="form.phone"></el-input>
+        <el-input v-model="form.phone" placeholder="请输入手机"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
-        <el-input v-model="form.password"></el-input>
+        <el-input v-model="form.password" placeholder="请输入密码"></el-input>
       </el-form-item>
       <el-form-item label="图形码" prop="code">
         <el-row>
-          <el-col :span="16" class="col">
-            <el-input v-model="form.code"></el-input>
+          <el-col :span="15">
+            <el-input v-model="form.code" placeholder="请输入图形码"></el-input>
           </el-col>
-          <el-col :span="6">
-            <img class="tu" :src="baseUrl+'/captcha?type=sendsms'" alt />
+          <el-col :span="7" :offset="2">
+            <img @click="refreshCode" class="tu" :src="codeUrl" alt />
           </el-col>
         </el-row>
       </el-form-item>
       <el-form-item label="验证码" prop="rcode">
-        <el-col :span="16" class="col">
-          <el-input v-model="form.rcode"></el-input>
+        <el-col :span="15">
+          <el-input v-model="form.rcode" placeholder="请输入验证码"></el-input>
         </el-col>
-        <el-col :span="6">
-          <el-button>获取用户验证码</el-button>
+        <el-col :span="7" :offset="2">
+          <el-button
+            @click="getPhoneCode"
+            :disabled="totalTime < 60"
+            class="btn"
+            >获取验证码
+            <span v-if="totalTime != 60">{{ totalTime }}s</span></el-button
+          >
         </el-col>
       </el-form-item>
     </el-form>
     <div slot="footer" class="footer">
-      <el-button @click="isShow=false">取消</el-button>
+      <el-button @click="isShow = false">取消</el-button>
       <el-button @click="goRegister" type="primary">确定</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
+// 导入api sendsms
+import { sendsms, register } from '@/api/login.js';
 export default {
   data() {
     return {
-      baseUrl: process.env.VUE_APP_URL,
-      imageUrl: "",
-      isShow: true,
+      totalTime: 60, // 验证码倒计时
+      baseUrl: process.env.VUE_APP_URL, // 基地址
+      codeUrl: process.env.VUE_APP_URL + '/captcha?type=sendsms', // 图形码地址
+      imageUrl: '', // 头像图片地址
+      isShow: true, // 注册框显示
       form: {
-        avatar: "", // 头像
-        username: "", // 昵称
-        email: "", // 邮箱
-        phone: "", // 手机号
-        password: "", // 密码
-        code: "", // 图形码
-        rcode: "" // 验证码
+        avatar: '', // 头像
+        username: '', // 昵称
+        email: '', // 邮箱
+        phone: '', // 手机号
+        password: '', // 密码
+        code: '', // 图形码
+        rcode: '', // 验证码
       },
       rules: {
-        avatar: [{ required: true, message: "必填项", trigger: "change" }],
-        username: [{ required: true, message: "必填项", trigger: "change" }],
-        email: [{ required: true, message: "必填项", trigger: "change" }],
-        phone: [{ required: true, message: "必填项", trigger: "change" }],
-        password: [{ required: true, message: "必填项", trigger: "change" }],
-        code: [{ required: true, message: "必填项", trigger: "change" }],
-        rcode: [{ required: true, message: "必填项", trigger: "change" }]
-      }
+        avatar: [{ required: true, message: '请添加头像', trigger: 'change' }],
+        username: [
+          { required: true, message: '请输入昵称', trigger: 'change' },
+        ],
+        email: [
+          { required: true, message: '请输入邮箱', trigger: 'change' },
+          {
+            validator: (rule, value, callback) => {
+              let reg = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+              setTimeout(() => {
+                if (reg.test(value)) {
+                  callback();
+                } else {
+                  callback('请正确输入邮箱');
+                }
+              }, 1000);
+            },
+            trigger: 'change',
+          },
+        ],
+        phone: [
+          { required: true, message: '请输入手机号', trigger: 'change' },
+          {
+            validator: (rule, value, callback) => {
+              let reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
+              setTimeout(() => {
+                if (reg.test(value)) {
+                  callback();
+                } else {
+                  callback('请正确输入手机号');
+                }
+              }, 1000);
+            },
+          },
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'change' },
+        ],
+        code: [{ required: true, message: '请输入图形码', trigger: 'change' }],
+        rcode: [{ required: true, message: '请输入验证码', trigger: 'change' }],
+      },
     };
+  },
+  watch: {
+    isShow(newVal) {
+      // 监听isShow清空表单
+      if (newVal == false) {
+        this.$refs.form.resetFields();
+        this.imageUrl = '';
+      }
+    },
   },
   methods: {
     handleAvatarSuccess(res, file) {
-      //   window.console.log(res);  // 接口返回的数据
-      //   window.console.log(file); // 文件信息
-      //   this.imageUrl = "http://127.0.0.1/heimamm/public/" + res.data.file_path;
+      //  res 接口返回的数据  file文件信息
+      //  this.imageUrl = "http://127.0.0.1/heimamm/public/" + res.data.file_path;
       this.imageUrl = URL.createObjectURL(file.raw);
       this.form.avatar = res.data.file_path;
-      this.$refs.form.validateField(["avatar"], error => {
+      this.$refs.form.validateField(['avatar'], (error) => {
         if (!error) {
           window.console.log(error);
         }
       });
     },
     beforeAvatarUpload(file) {
-      let arr = ["image/jpeg", "image/png"];
+      let arr = ['image/jpeg', 'image/png'];
       const isJPG = arr.includes(file.type); // 类型
       const isLt2M = file.size / 1024 / 1024 < 2; // 大小 file.size是文件字节大小
       if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
+        this.$message.error('上传头像图片只能是 JPG,PNG 格式!');
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
+        this.$message.error('上传头像图片大小不能超过 2MB!');
       }
       return isJPG && isLt2M;
     },
     goRegister() {
-      this.$refs.form.validate(result => {
+      this.$refs.form.validate((result) => {
         if (!result) {
-          this.$message.warning("每一项必填");
+          this.$message.warning('每一项必填');
+        } else {
+          register(this.form).then(() => {
+            // if (res.data.code===200) {
+            this.$message.success('注册成功');
+            this.isShow = false;
+            // } else {
+            // this.$message.success('注册失败');
+            // }
+          });
         }
       });
-    }
-  }
+    },
+    getPhoneCode() {
+      let pass = 0; // 正确次数
+      this.$refs.form.validateField(['phone', 'code'], (err) => {
+        if (!err) {
+          pass++;
+        }
+        if (pass === 2) {
+          this.totalTime--; // 先减一，因为计时器延迟一秒执行
+          let inter = setInterval(() => {
+            this.totalTime--;
+            if (this.totalTime <= 0) {
+              this.totalTime = 60;
+              clearInterval(inter);
+            }
+          }, 1000);
+          sendsms({
+            code: this.form.code,
+            phone: this.form.phone,
+          }).then((res) => {
+            this.$message.success(res.data.captcha + ''); // $message要传递字符串
+          });
+        }
+      });
+    },
+    refreshCode() {
+      this.codeUrl =
+        process.env.VUE_APP_URL + '/captcha?type=sendsms&xx=' + Date.now(); // 随机地址
+    },
+  },
 };
 </script>
 
@@ -136,11 +229,12 @@ export default {
     text-align: center;
   }
   .tu {
+    display: block;
     height: 40px;
     width: 100%;
   }
-  .col {
-    margin-right: 21px;
+  .btn {
+    width: 100%;
   }
   .avatar-uploader {
     text-align: center;
