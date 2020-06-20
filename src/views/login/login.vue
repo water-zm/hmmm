@@ -25,7 +25,7 @@
               <el-input v-model="form.code" prefix-icon="el-icon-key" placeholder="请输入验证码"></el-input>
             </el-col>
             <el-col :span="8">
-              <img class="code" :src="codeUrl" alt />
+              <img @click="refreshCode" class="code" :src="codeUrl" alt />
             </el-col>
           </el-row>
         </el-form-item>
@@ -53,6 +53,8 @@
 
 <script>
 import register from "./register";
+import { login } from "@/api/login.js";
+import { localSave } from "@/utils/local.js";
 export default {
   components: {
     register
@@ -69,7 +71,16 @@ export default {
       rules: {
         phone: [
           { required: true, message: "请输入手机号", trigger: "change" },
-          { min: 11, max: 11, message: "请输入正确的手机号", trigger: "change" }
+          {
+            validator: (rule, val, callback) => {
+              let reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
+              if (reg.test(val)) {
+                callback();
+              } else {
+                callback("请填写正确的手机号");
+              }
+            }
+          }
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "change" },
@@ -77,9 +88,20 @@ export default {
         ],
         code: [
           { required: true, message: "请输入验证码", trigger: "change" },
-          { min: 4, max: 4, message: "请输入4位密码", trigger: "change" }
+          { min: 4, max: 4, message: "请输入4位验证码", trigger: "change" }
         ],
-        isCheck: [{ required: true, message: "请勾选选项", trigger: "change" }]
+        isCheck: [
+          { required: true, message: "请勾选选项", trigger: "change" },
+          {
+            validator: (rule, val, callback) => {
+              if (val === true) {
+                callback();
+              } else {
+                callback("请阅读协议并勾选");
+              }
+            }
+          }
+        ]
       }
     };
   },
@@ -88,9 +110,19 @@ export default {
       this.$refs.form.validate(result => {
         window.console.log(result);
         if (!result) {
-          this.$message.error("错了哦，这是一条错误消息");
+          this.$message.error("登录失败");
+        } else {
+          login(this.form).then(res => {
+            this.$message.success("登录成功");
+            localSave(res.data.token);
+            this.$router.push("/layout");
+          });
         }
       });
+    },
+    refreshCode() {
+      this.codeUrl =
+        process.env.VUE_APP_URL + "/captcha?type=login&random=" + Date.now();
     }
   }
 };
