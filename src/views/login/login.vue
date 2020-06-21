@@ -117,9 +117,15 @@ export default {
           this.$message.error("登录失败");
         } else {
           login(this.form).then(res => {
-            this.$message.success("登录成功");
-            localSave(res.data.token);
-            this.$router.push("/layout");
+            if (res.code === 202) {
+              this.refreshCode();
+              this.$message.error(res.message);
+              this.form.code = "";
+            } else {
+              this.$message.success("登录成功");
+              localSave(res.data.token);
+              this.$router.push("/layout");
+            }
           });
         }
       });

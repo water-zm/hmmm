@@ -1,5 +1,5 @@
 <template>
-  <div>dataOverview</div>
+  <div>subject</div>
 </template>
 
 <script>

@@ -12,24 +12,29 @@
     </el-header>
     <el-container>
       <el-aside width="auto" class="left">
-        <el-menu default-active="2" :collapse="bol" class="el-menu-vertical-demo">
-          <el-menu-item index="1">
+        <el-menu
+          default-active="dataOverview"
+          :router="true"
+          :collapse="bol"
+          class="el-menu-vertical-demo"
+        >
+          <el-menu-item index="dataOverview">
             <i class="el-icon-pie-chart"></i>
             <span slot="title">数据概览</span>
           </el-menu-item>
-          <el-menu-item index="2">
+          <el-menu-item index="userList">
             <i class="el-icon-user"></i>
             <span slot="title">用户列表</span>
           </el-menu-item>
-          <el-menu-item index="3">
+          <el-menu-item index="question">
             <i class="el-icon-edit-outline"></i>
             <span slot="title">题库列表</span>
           </el-menu-item>
-          <el-menu-item index="4">
+          <el-menu-item index="company">
             <i class="el-icon-office-building"></i>
             <span slot="title">企业列表</span>
           </el-menu-item>
-          <el-menu-item index="5">
+          <el-menu-item index="subject">
             <i class="el-icon-notebook-2"></i>
             <span slot="title">学科列表</span>
           </el-menu-item>
@@ -45,7 +50,7 @@
 
 <script>
 import { getUserInfo, logout } from "@/api/layout.js";
-import { localRemove } from "@/utils/local.js";
+import { localRemove, localGet } from "@/utils/local.js";
 export default {
   data() {
     return {
@@ -55,17 +60,41 @@ export default {
     };
   },
   created() {
+    // window.console.log("fullPath：", this.$route.fullPath);
+    // window.console.log("path：", this.$route.path);
+    if (!localGet()) {
+      this.$router.push("/");
+      return;
+    }
     getUserInfo().then(res => {
-      window.console.log(res);
+      // window.console.log(res);
       this.userInfo = res.data;
     });
   },
   methods: {
     exit() {
-      logout().then(() => {
-        localRemove();
-        this.$router.push("/");
-      });
+      this.$confirm("此操作将退出账号, 是否继续?", "提示", {
+        confirmButtonText: "狠心离开",
+        cancelButtonText: "再逛逛看",
+        type: "warning",
+        center: true
+      })
+        .then(() => {
+          logout().then(() => {
+            localRemove();
+            this.$router.push("/");
+          });
+          this.$message({
+            type: "success",
+            message: "退出成功!"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消退出"
+          });
+        });
     }
   }
 };

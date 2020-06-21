@@ -4,6 +4,7 @@ export function login(data) {
     return instance({
         method: 'post',
         url: '/login',
-        data
+        data,
+        noerror: true
     })
 }
