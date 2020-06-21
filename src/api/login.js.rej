@@ -1,0 +1,11 @@
+diff a/src/api/login.js b/src/api/login.js	(rejected hunks)
+@@ -4,6 +4,7 @@
+     return instance({
+         method: 'post',
+         url: '/login',
+-        data
++        data,
++        noerror: true
+     })
+ }
+\ No newline at end of file
