@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
+import Nprogress from 'nprogress'
+import 'nprogress/nprogress.css'
+
 import login from '@/views/login//login'
 import layout from '@/views/layout/layout'
 import dataOverview from '@/views/layout/dataOverview/dataOverview.vue'
@@ -39,4 +42,14 @@ const router = new VueRouter({
         }]
     }]
 })
+
+router.beforeEach((to, from, next) => {
+    Nprogress.start()
+    next()
+
+})
+router.afterEach(() => {
+    Nprogress.done()
+})
+
 export default router
