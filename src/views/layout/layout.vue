@@ -1,40 +1,44 @@
 <template>
   <el-container class="layout">
     <el-header class="header">
-      <div @click="bol=!bol" class="el-icon-s-fold icon"></div>
+      <div @click="bol = !bol" class="el-icon-s-fold icon"></div>
       <img class="logo" src="@/assets/img/layout_logo2.png" alt />
       <div class="title1">黑马面面</div>
       <div class="nouse"></div>
-      <img class="avatar" v-if="userInfo!=''" :src="baseUrl+'/'+userInfo.avatar" alt />
-      <img class="avatar" v-else src="@/assets/img/avatar.png" alt />
-      <div class="title2">{{userInfo.username}}，您好</div>
+      <img
+        class="avatar"
+        v-if="$store.state.userInfo != ''"
+        :src="baseUrl + '/' + $store.state.userInfo.avatar"
+        alt
+      />
+      <div class="title2">{{ $store.state.userInfo.username }}，您好</div>
       <el-button @click="exit" type="primary">退出</el-button>
     </el-header>
     <el-container>
       <el-aside width="auto" class="left">
         <el-menu
-          default-active="dataOverview"
+          :default-active="$route.path"
           :router="true"
           :collapse="bol"
           class="el-menu-vertical-demo"
         >
-          <el-menu-item index="dataOverview">
+          <el-menu-item index="/layout/dataOverview">
             <i class="el-icon-pie-chart"></i>
             <span slot="title">数据概览</span>
           </el-menu-item>
-          <el-menu-item index="userList">
+          <el-menu-item index="/layout/userList">
             <i class="el-icon-user"></i>
             <span slot="title">用户列表</span>
           </el-menu-item>
-          <el-menu-item index="question">
+          <el-menu-item index="/layout/question">
             <i class="el-icon-edit-outline"></i>
             <span slot="title">题库列表</span>
           </el-menu-item>
-          <el-menu-item index="company">
+          <el-menu-item index="/layout/company">
             <i class="el-icon-office-building"></i>
             <span slot="title">企业列表</span>
           </el-menu-item>
-          <el-menu-item index="subject">
+          <el-menu-item index="/layout/subject">
             <i class="el-icon-notebook-2"></i>
             <span slot="title">学科列表</span>
           </el-menu-item>
@@ -47,59 +51,49 @@
   </el-container>
 </template>
 
-
 <script>
-import { getUserInfo, logout } from "@/api/layout.js";
-import { localRemove, localGet } from "@/utils/local.js";
+import { getUserInfo, logout } from '@/api/layout.js';
+import { localRemove, localGet } from '@/utils/local.js';
 export default {
   data() {
     return {
       baseUrl: process.env.VUE_APP_URL,
-      userInfo: "", // 用户信息
-      bol: false
+      userInfo: '', // 用户信息
+      bol: false,
     };
   },
   created() {
     // window.console.log("fullPath：", this.$route.fullPath);
     // window.console.log("path：", this.$route.path);
     if (!localGet()) {
-      this.$router.push("/");
+      this.$router.push('/');
       return;
     }
-    getUserInfo().then(res => {
-      // window.console.log(res);
-      this.userInfo = res.data;
+    getUserInfo().then((res) => {
+      this.$store.state.userInfo = res.data;
     });
   },
   methods: {
     exit() {
-      this.$confirm("此操作将退出账号, 是否继续?", "提示", {
-        confirmButtonText: "狠心离开",
-        cancelButtonText: "再逛逛看",
-        type: "warning",
-        center: true
-      })
-        .then(() => {
-          logout().then(() => {
-            localRemove();
-            this.$router.push("/");
-          });
-          this.$message({
-            type: "success",
-            message: "退出成功!"
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "取消退出"
-          });
+      this.$confirm('此操作将退出账号, 是否继续?', '提示', {
+        confirmButtonText: '狠心离开',
+        cancelButtonText: '再逛逛看',
+        type: 'warning',
+        center: true,
+      }).then(() => {
+        logout().then(() => {
+          localRemove();
+          this.$router.push('/');
         });
-    }
-  }
+        this.$message({
+          type: 'success',
+          message: '退出成功!',
+        });
+      });
+    },
+  },
 };
 </script>
-
 
 <style lang="less">
 .layout {

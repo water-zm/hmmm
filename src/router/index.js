@@ -26,29 +26,49 @@ const router = new VueRouter({
         redirect: '/layout/dataOverview',
         children: [{
             path: 'dataOverview',
-            component: dataOverview
+            component: dataOverview,
+            meta: {
+                title: '数据概览'
+            }
         }, {
             path: 'userList',
-            component: userList
+            component: userList,
+            meta: {
+                title: '用户列表'
+            }
         }, {
             path: 'question',
-            component: question
+            component: question,
+            meta: {
+                title: '题库列表'
+            }
         }, {
             path: 'company',
-            component: company
+            component: company,
+            meta: {
+                title: '企业列表'
+            }
         }, {
             path: 'subject',
-            component: subject
+            component: subject,
+            meta: {
+                title: '学科列表'
+            }
         }]
     }]
 })
 
+const originalPush = VueRouter.prototype.push;
+VueRouter.prototype.push = function push(location) {
+    return originalPush.call(this, location).catch((err) => err);
+};
+
 router.beforeEach((to, from, next) => {
     Nprogress.start()
     next()
-
 })
-router.afterEach(() => {
+router.afterEach((to) => {
+    document.title = to.meta.title
     Nprogress.done()
 })
 
