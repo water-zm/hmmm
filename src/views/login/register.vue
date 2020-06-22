@@ -67,6 +67,7 @@ export default {
       codeUrl: process.env.VUE_APP_URL + "/captcha?type=sendsms", // 图形码地址
       imageUrl: "", // 头像图片地址
       isShow: false, // 注册框显示
+      captcha: "", // 接口返回的验证码
       form: {
         avatar: "", // 头像
         username: "", // 昵称
@@ -117,7 +118,18 @@ export default {
           { min: 6, max: 12, message: "请输入6-12位密码", trigger: "change" }
         ],
         code: [{ required: true, message: "请输入图形码", trigger: "change" }],
-        rcode: [{ required: true, message: "请输入验证码", trigger: "change" }]
+        rcode: [
+          { required: true, message: "请输入验证码", trigger: "change" },
+          {
+            validator: (rule, val, callback) => {
+              if (val == this.captcha) {
+                callback();
+              } else {
+                callback("验证码错误");
+              }
+            }
+          }
+        ]
       }
     };
   },
@@ -191,9 +203,11 @@ export default {
           }).then(res => {
             if (res.code == 200) {
               this.$message.success(res.data.captcha + ""); // $message要传递字符串
+              this.captcha = res.data.captcha;
             } else {
               this.$message.error(res.message);
               this.refreshCode();
+              this.form.code = "";
             }
           });
         }

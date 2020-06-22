@@ -54,8 +54,13 @@
 <script>
 import register from "./register";
 import { login } from "@/api/login.js";
-import { localSave } from "@/utils/local.js";
+import { localSave, localGet } from "@/utils/local.js";
 export default {
+  created() {
+    if (localGet()) {
+      this.$router.push("/layout");
+    }
+  },
   components: {
     register
   },
@@ -108,14 +113,19 @@ export default {
   methods: {
     toLogin() {
       this.$refs.form.validate(result => {
-        window.console.log(result);
         if (!result) {
           this.$message.error("登录失败");
         } else {
           login(this.form).then(res => {
-            this.$message.success("登录成功");
-            localSave(res.data.token);
-            this.$router.push("/layout");
+            if (res.code === 202) {
+              this.refreshCode();
+              this.$message.error(res.message);
+              this.form.code = "";
+            } else {
+              this.$message.success("登录成功");
+              localSave(res.data.token);
+              this.$router.push("/layout");
+            }
           });
         }
       });
