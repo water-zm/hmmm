@@ -8,3 +8,39 @@ export function getSubjectList(params) {
         params
     })
 }
+
+// 新增学科
+export function addSubject(data) {
+    return instance({
+        url: '/subject/add',
+        method: 'post',
+        data
+    })
+}
+
+// 删除学科
+export function removeSubject(data) {
+    return instance({
+        url: '/subject/remove',
+        method: 'post',
+        data
+    })
+}
+
+// 学科修改状态
+export function setSubjectStatus(data) {
+    return instance({
+        url: '/subject/status',
+        method: 'post',
+        data
+    })
+}
+
+// 编辑学科
+export function editSubject(data) {
+    return instance({
+        url: "/subject/edit",
+        method: 'post',
+        data
+    })
+}
