@@ -52,7 +52,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <div v-else>暂无数据</div>
       <el-pagination
         @size-change="changeSize"
         @current-change="changeCurrent"

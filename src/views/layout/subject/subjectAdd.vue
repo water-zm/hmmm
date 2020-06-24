@@ -93,7 +93,7 @@ export default {
   .dialog-title {
     height: 53px;
     line-height: 53px;
-    font-size: 1px;
+    font-size: 18px;
     color: #fff;
     text-align: center;
     background: linear-gradient(to right, #01c5fa, #1395fa);
