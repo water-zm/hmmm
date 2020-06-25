@@ -27,15 +27,13 @@
     <el-card>
       <el-table :data="list">
         <el-table-column label="序号" width="100">
-          <template v-slot="scope">{{
+          <template v-slot="scope">
+            {{
             pagination.pageSize * (pagination.page - 1) + scope.$index + 1
-          }}</template>
+            }}
+          </template>
         </el-table-column>
-        <el-table-column
-          prop="eid"
-          label="企业编号"
-          width="180"
-        ></el-table-column>
+        <el-table-column prop="eid" label="企业编号" width="180"></el-table-column>
         <el-table-column prop="name" label="企业名称"></el-table-column>
         <el-table-column prop="username" label="创建者"></el-table-column>
         <el-table-column prop="create_time" label="创建日期"></el-table-column>
@@ -47,18 +45,13 @@
         </el-table-column>
         <el-table-column label="操作">
           <template v-slot="scope">
-            <el-link @click="edit(scope.row)" type="primary" class="btn"
-              >编辑</el-link
-            >
+            <el-link @click="edit(scope.row)" type="primary" class="btn">编辑</el-link>
             <el-link
               @click="changeStatus(scope.row.id)"
               type="primary"
               class="btn"
-              >{{ scope.row.status == 1 ? '禁用' : '启用' }}</el-link
-            >
-            <el-link @click="remove(scope.row.id)" type="primary" class="btn"
-              >删除</el-link
-            >
+            >{{ scope.row.status == 1 ? '禁用' : '启用' }}</el-link>
+            <el-link @click="remove(scope.row.id)" type="primary" class="btn">删除</el-link>
           </template>
         </el-table-column>
       </el-table>
@@ -85,30 +78,30 @@
 </template>
 
 <script>
-import companyDialog from './companyDialog';
-import { getCompanyList, statusSet, companyRemove } from '@/api/company';
+import companyDialog from "./companyDialog";
+import { getCompanyList, statusSet, companyRemove } from "@/api/company";
 export default {
   components: {
-    companyDialog,
+    companyDialog
   },
   data() {
     return {
       form: {
-        eid: '', // 企业id
-        name: '', // 企业名称
-        username: '', // 用户名
-        status: '', // 状态 1（启用） 0（禁用）
-        page: '', // 页码 默认为1
-        limit: '', // 页尺寸 默认为10
+        eid: "", // 企业id
+        name: "", // 企业名称
+        username: "", // 用户名
+        status: "", // 状态 1（启用） 0（禁用）
+        page: "", // 页码 默认为1
+        limit: "" // 页尺寸 默认为10
       },
       list: [],
       pagination: {
         page: 1, // 当前页
         total: 5, // 总数
-        pageSize: 1, // 页尺寸
+        pageSize: 1 // 页尺寸
       },
-      meta: 'add',
-      formData: '',
+      meta: "add",
+      formData: ""
     };
   },
   created() {
@@ -119,12 +112,12 @@ export default {
       let _page = {
         ...this.form,
         page: this.pagination.page,
-        limit: this.pagination.pageSize,
+        limit: this.pagination.pageSize
       };
-      getCompanyList(_page).then((res) => {
+      getCompanyList(_page).then(res => {
         window.console.log(res);
-        res.data.items.forEach((item) => {
-          item.create_time = item.create_time.split(' ')[0];
+        res.data.items.forEach(item => {
+          item.create_time = item.create_time.split(" ")[0];
         });
         this.list = res.data.items;
         this.pagination.total = res.data.pagination.total;
@@ -148,26 +141,26 @@ export default {
     },
     changeStatus(id) {
       statusSet({ id }).then(() => {
-        this.$message.success('修改状态成功');
+        this.$message.success("修改状态成功");
         this.getList();
       });
     },
     remove(id) {
       companyRemove({ id }).then(() => {
-        this.$message.success('删除成功');
+        this.$message.success("删除成功");
         this.getList();
       });
     },
     add() {
       this.$refs.comDia.isShow = true;
-      this.meta = 'add';
+      this.meta = "add";
     },
     edit(row) {
       this.$refs.comDia.isShow = true;
-      this.meta = 'edit';
+      this.meta = "edit_" + Date.now();
       this.formData = row;
-    },
-  },
+    }
+  }
 };
 </script>
 

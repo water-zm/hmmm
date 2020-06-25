@@ -1,8 +1,6 @@
 <template>
   <el-dialog :visible.sync="isShow" class="companyDialog" width="600px">
-    <div slot="title" class="dialog-title">
-      {{ meta == 'add' ? '新增' : '编辑' }}企业
-    </div>
+    <div slot="title" class="dialog-title">{{ meta == 'add' ? '新增' : '编辑' }}企业</div>
     <el-form ref="form" :model="form" :rules="rules" label-width="80px">
       <el-form-item prop="eid" label="企业编号">
         <el-input v-model="form.eid"></el-input>
@@ -28,76 +26,84 @@
 </template>
 
 <script>
-import { companyAdd, companyEdit } from '@/api/company';
+import { companyAdd, companyEdit } from "@/api/company";
 export default {
-  props: ['meta', 'formData'],
+  props: ["meta", "formData"],
   data() {
     return {
       isShow: false,
       form: {
-        eid: '', // 企业编号
-        name: '', // 企业名称
-        short_name: '', // 简称
-        intro: '', // 企业简介
-        remark: '', // 备注
+        eid: "", // 企业编号
+        name: "", // 企业名称
+        short_name: "", // 简称
+        intro: "", // 企业简介
+        remark: "" // 备注
       },
       rules: {
-        eid: [{ required: true, message: '请输入企业编号', trigger: 'change' }],
+        eid: [{ required: true, message: "请输入企业编号", trigger: "change" }],
         name: [
-          { required: true, message: '请输入企业名称', trigger: 'change' },
+          { required: true, message: "请输入企业名称", trigger: "change" }
         ],
         short_name: [
-          { required: true, message: '请输入简称', trigger: 'change' },
+          { required: true, message: "请输入简称", trigger: "change" }
         ],
         intro: [
-          { required: true, message: '请输入企业简介', trigger: 'change' },
-        ],
-      },
+          { required: true, message: "请输入企业简介", trigger: "change" }
+        ]
+      }
     };
   },
   methods: {
     submit() {
-      this.$refs.form.validate((result) => {
+      this.$refs.form.validate(result => {
         if (!result) {
-          this.$message.warning('请输入内容');
+          this.$message.warning("请输入内容");
         } else {
-          if (this.meta == 'add') {
+          if (this.meta == "add") {
             companyAdd(this.form).then(() => {
               // window.console.log(res);
-              this.$message.success('新增企业成功');
+              this.$message.success("新增企业成功");
               this.isShow = false;
-              this.$emit('search');
+              this.$emit("search");
             });
-          } else if (this.meta == 'edit') {
+          } else {
             companyEdit(this.form).then(() => {
-              this.$message.success('编辑企业成功');
+              this.$message.success("编辑企业成功");
               this.isShow = false;
-              this.$emit('getData');
+              this.$emit("getData");
             });
           }
         }
       });
-    },
+    }
   },
   watch: {
     isShow(newVal) {
       if (newVal == false) {
         this.$refs.form.resetFields();
         this.form = {
-          eid: '', // 企业编号
-          name: '', // 企业名称
-          short_name: '', // 简称
-          intro: '', // 企业简介
-          remark: '', // 备注
+          eid: "", // 企业编号
+          name: "", // 企业名称
+          short_name: "", // 简称
+          intro: "", // 企业简介
+          remark: "" // 备注
         };
       }
     },
     meta(newVal) {
-      if (newVal == 'edit') {
+      if (newVal == "add") {
+        this.form = {
+          eid: "", // 企业编号
+          name: "", // 企业名称
+          short_name: "", // 简称
+          intro: "", // 企业简介
+          remark: "" // 备注
+        };
+      } else {
         this.form = JSON.parse(JSON.stringify(this.formData));
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
