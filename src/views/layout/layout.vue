@@ -72,7 +72,11 @@ export default {
     getUserInfo().then(res => {
       this.$store.state.userInfo = res.data;
       this.$store.state.roleInit = this.$store.state.roleObj[res.data.role_id];
-      if (!this.$route.meta.roles.includes(res.data.role_id)) {
+      if (
+        !this.$route.meta.roles.includes(
+          this.$store.state.roleObj[res.data.role_id]
+        )
+      ) {
         this.$message.error("你没有权限访问该页面，请重新登录");
         localRemove();
         this.$router.push("/");
