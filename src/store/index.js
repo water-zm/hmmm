@@ -4,7 +4,14 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: {
-        userInfo: ""
+        userInfo: "",
+        roleObj: {
+            1: '超级管理员',
+            2: '管理员',
+            3: '老师',
+            4: '学生'
+        },
+        roleInit: '超级管理员'
     }
 })
 

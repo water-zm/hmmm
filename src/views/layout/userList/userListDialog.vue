@@ -1,8 +1,6 @@
 <template>
   <el-dialog :visible.sync="isShow" class="userDialog" width="477px">
-    <div slot="title" class="dialog-title">
-      {{ meta == 'add' ? '新增' : '编辑' }}用户
-    </div>
+    <div slot="title" class="dialog-title">{{ meta == 'add' ? '新增' : '编辑' }}用户</div>
     <el-form ref="form" :model="form" :rules="rules" label-width="80px">
       <el-form-item prop="username" label="用户名">
         <el-input v-model="form.username"></el-input>
@@ -15,9 +13,12 @@
       </el-form-item>
       <el-form-item prop="role_id" label="角色">
         <el-select v-model="form.role_id" placeholder="请选择角色">
-          <el-option value="2">管理员</el-option>
-          <el-option value="3">老师</el-option>
-          <el-option value="4">学生</el-option>
+          <el-option
+            :value="key"
+            :label="value"
+            v-for="(value, key,index) in $store.state.roleObj"
+            :key="index"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item prop="status" label="状态">
@@ -38,97 +39,107 @@
 </template>
 
 <script>
-import { addUser, editUser } from '@/api/userList';
+import { addUser, editUser } from "@/api/userList";
 export default {
-  props: ['meta', 'formData'],
+  props: ["meta", "formData"],
   data() {
     return {
       isShow: false,
       form: {
-        username: '', // 用户名
-        email: '', // 邮箱
-        phone: '', // 手机号
-        role_id: '', // 角色 、2 管理员、3 老师、4 学生
-        status: '', // 1(启用)0(禁用)
-        remark: '', // 备注
+        username: "", // 用户名
+        email: "", // 邮箱
+        phone: "", // 手机号
+        role_id: "", // 角色 、2 管理员、3 老师、4 学生
+        status: "", // 1(启用)0(禁用)
+        remark: "" // 备注
       },
       rules: {
         username: [
-          { required: true, message: '请输入用户名', trigger: 'change' },
+          { required: true, message: "请输入用户名", trigger: "change" }
         ],
         email: [
-          { required: true, message: '请输入邮箱', trigger: 'change' },
+          { required: true, message: "请输入邮箱", trigger: "change" },
           {
             validator: (rule, val, callback) => {
               let reg = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
               if (reg.test(val)) {
                 callback();
               } else {
-                callback('请输入正确的邮箱');
+                callback("请输入正确的邮箱");
               }
-            },
-          },
+            }
+          }
         ],
         phone: [
-          { required: true, message: '请输入手机号', trigger: 'change' },
+          { required: true, message: "请输入手机号", trigger: "change" },
           {
             validator: (rule, val, callback) => {
               let reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
               if (reg.test(val)) {
                 callback();
               } else {
-                callback('请输入正确的手机号');
+                callback("请输入正确的手机号");
               }
-            },
-          },
+            }
+          }
         ],
-        role_id: [{ required: true, message: '请选择角色', trigger: 'change' }],
-      },
+        role_id: [{ required: true, message: "请选择角色", trigger: "change" }]
+      }
     };
   },
   methods: {
     submit() {
-      this.$refs.form.validate((result) => {
+      this.$refs.form.validate(result => {
         if (!result) {
-          this.$message.warning('请输入内容');
+          this.$message.warning("请输入内容");
         } else {
-          if (this.meta == 'add') {
+          if (this.meta == "add") {
             addUser(this.form).then(() => {
-              this.$message.success('新增用户成功');
-              this.$emit('search');
+              this.$message.success("新增用户成功");
+              this.$emit("search");
               this.isShow = false;
             });
-          } else if (this.meta == 'edit') {
+          } else {
             editUser(this.form).then(() => {
-              this.$message.success('编辑用户成功');
-              this.$emit('getData');
+              this.$message.success("编辑用户成功");
+              this.$emit("getData");
               this.isShow = false;
             });
           }
         }
       });
-    },
+    }
   },
   watch: {
     isShow(newVal) {
       if (newVal == false) {
         this.$refs.form.resetFields();
         this.form = {
-          username: '', // 用户名
-          email: '', // 邮箱
-          phone: '', // 手机号
-          role_id: '', // 角色 、2 管理员、3 老师、4 学生
-          status: '', // 1(启用)0(禁用)
-          remark: '', // 备注
+          username: "", // 用户名
+          email: "", // 邮箱
+          phone: "", // 手机号
+          role_id: "", // 角色 、2 管理员、3 老师、4 学生
+          status: "", // 1(启用)0(禁用)
+          remark: "" // 备注
         };
       }
     },
     meta(newVal) {
-      if (newVal == 'edit') {
+      if (newVal == "add") {
+        this.form = {
+          username: "", // 用户名
+          email: "", // 邮箱
+          phone: "", // 手机号
+          role_id: "", // 角色 、2 管理员、3 老师、4 学生
+          status: "", // 1(启用)0(禁用)
+          remark: "" // 备注
+        };
+      } else {
         this.form = JSON.parse(JSON.stringify(this.formData));
+        this.form.role_id = this.$store.state.roleObj[this.form.role_id];
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

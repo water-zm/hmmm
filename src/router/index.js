@@ -1,8 +1,16 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '@/store/index'
 
 import Nprogress from 'nprogress'
 import 'nprogress/nprogress.css'
+
+import {
+    Message
+} from 'element-ui'
+import {
+    localRemove
+} from '@/utils/local'
 
 import login from '@/views/login//login'
 import layout from '@/views/layout/layout'
@@ -16,43 +24,56 @@ Vue.use(VueRouter)
 const router = new VueRouter({
     routes: [{
         path: '/',
-        component: login
+        component: login,
+        meta: {
+            title: '登录',
+            roles: ['超级管理员', '管理员', '老师', '学生']
+        }
     }, {
         path: '/login',
-        component: login
+        component: login,
+        meta: {
+            title: '登录',
+            roles: ['超级管理员', '管理员', '老师', '学生']
+        }
     }, {
         path: '/layout',
         component: layout,
-        redirect: '/layout/dataOverview',
+        redirect: '/layout/subject',
         children: [{
             path: 'dataOverview',
             component: dataOverview,
             meta: {
-                title: '数据概览'
+                title: '数据概览',
+                roles: ['超级管理员', '管理员', '老师']
             }
         }, {
             path: 'userList',
             component: userList,
             meta: {
-                title: '用户列表'
+                title: '用户列表',
+                roles: ['超级管理员', '管理员']
             }
         }, {
             path: 'question',
             component: question,
             meta: {
-                title: '题库列表'
+                title: '题库列表',
+                roles: ['超级管理员', '管理员', '老师']
             }
         }, {
             path: 'company',
             component: company,
             meta: {
-                title: '企业列表'
+                title: '企业列表',
+                roles: ['超级管理员', '管理员', '老师']
             }
         }, {
             path: 'subject',
             component: subject,
             meta: {
-                title: '学科列表'
+                title: '学科列表',
+                roles: ['超级管理员', '管理员', '老师', '学生']
             }
         }]
     }]
@@ -65,7 +86,13 @@ VueRouter.prototype.push = function push(location) {
 
 router.beforeEach((to, from, next) => {
     Nprogress.start()
-    next()
+    if (!to.meta.roles.includes(store.state.roleInit)) {
+        Message.error('你没有权限访问该页面，请重新登录')
+        localRemove()
+        next('/')
+    } else {
+        next()
+    }
 })
 router.afterEach((to) => {
     document.title = to.meta.title

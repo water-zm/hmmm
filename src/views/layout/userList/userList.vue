@@ -9,7 +9,14 @@
           <el-input v-model="form.email" class="w150"></el-input>
         </el-form-item>
         <el-form-item prop="role_id" label="角色">
-          <el-input v-model="form.role_id" class="w150"></el-input>
+          <el-select v-model="form.role_id" class="w150">
+            <el-option
+              :value="key"
+              :label="value"
+              v-for="(value,key, index) in $store.state.roleObj"
+              :key="index"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button @click="search" type="primary">搜索</el-button>
@@ -21,38 +28,34 @@
     <el-card>
       <el-table :data="list" border>
         <el-table-column label="序号">
-          <template v-slot="scope">{{
+          <template v-slot="scope">
+            {{
             pagination.pageSize * (pagination.page - 1) + scope.$index + 1
-          }}</template>
+            }}
+          </template>
         </el-table-column>
         <el-table-column prop="username" label="用户名"></el-table-column>
         <el-table-column prop="phone" label="电话"></el-table-column>
         <el-table-column prop="email" label="邮箱"></el-table-column>
         <el-table-column label="角色">
-          <template v-slot="scope">
-            <span v-if="scope.row.role_id == 2">管理员</span>
-            <span v-else-if="scope.row.role_id == 3">老师</span>
-            <span v-else>学生</span>
-          </template>
+          <template v-slot="scope">{{$store.state.roleObj[scope.row.role_id]}}</template>
         </el-table-column>
         <el-table-column prop="remark" label="备注"></el-table-column>
         <el-table-column label="状态">
           <template v-slot="scope">
-            <span v-if="scope.row.status == 1" style="color:red">禁用</span>
+            <span v-if="scope.row.status == 0" style="color:red">禁用</span>
             <span v-else>启用</span>
           </template>
         </el-table-column>
         <el-table-column label="操作">
           <template v-slot="scope">
-            <el-link @click="edit(scope.row)" type="primary" class="btn"
-              >编辑</el-link
-            >
-            <el-link @click="status(scope.row.id)" type="primary" class="btn">{{
+            <el-link @click="edit(scope.row)" type="primary" class="btn">编辑</el-link>
+            <el-link @click="status(scope.row.id)" type="primary" class="btn">
+              {{
               scope.row.status == 1 ? '禁用' : '启用'
-            }}</el-link>
-            <el-link @click="remove(scope.row.id)" type="primary" class="btn"
-              >删除</el-link
-            >
+              }}
+            </el-link>
+            <el-link @click="remove(scope.row.id)" type="primary" class="btn">删除</el-link>
           </template>
         </el-table-column>
       </el-table>
@@ -66,8 +69,7 @@
         :total="pagination.total"
         background
         class="page"
-      >
-      </el-pagination>
+      ></el-pagination>
     </el-card>
     <userListDialog
       ref="dialog"
@@ -80,29 +82,29 @@
 </template>
 
 <script>
-import userListDialog from './userListDialog';
-import { getUserList, removeUser, setStatus } from '@/api/userList.js';
+import userListDialog from "./userListDialog";
+import { getUserList, removeUser, setStatus } from "@/api/userList.js";
 export default {
   components: {
-    userListDialog,
+    userListDialog
   },
   data() {
     return {
       form: {
-        username: '', // 昵称
-        email: '', // 邮箱
-        role_id: '', // 角色数字 2管理员、3老师、 4学生
-        page: '', // 页码 默认为1
-        limit: '', // 页尺寸 默认为10
+        username: "", // 昵称
+        email: "", // 邮箱
+        role_id: "", // 角色数字 2管理员、3老师、 4学生
+        page: "", // 页码 默认为1
+        limit: "" // 页尺寸 默认为10
       },
       list: [], // 列表数据
       pagination: {
         page: 1, // 当前页
         total: 5, // 总数
-        pageSize: 3, // 页尺寸
+        pageSize: 3 // 页尺寸
       },
-      meta: 'add', // 区分新增 编辑
-      formData: '', // 编辑表单
+      meta: "add", // 区分新增 编辑
+      formData: "" // 编辑表单
     };
   },
   created() {
@@ -113,9 +115,9 @@ export default {
       let _page = {
         ...this.form,
         page: this.pagination.page,
-        limit: this.pagination.pageSize,
+        limit: this.pagination.pageSize
       };
-      getUserList(_page).then((res) => {
+      getUserList(_page).then(res => {
         this.list = res.data.items;
         this.pagination.total = res.data.pagination.total;
       });
@@ -138,26 +140,26 @@ export default {
     },
     status(id) {
       setStatus({ id }).then(() => {
-        this.$message.success('修改状态成功');
+        this.$message.success("修改状态成功");
         this.getData();
       });
     },
     remove(id) {
       removeUser({ id }).then(() => {
-        this.$message.success('删除成功');
+        this.$message.success("删除成功");
         this.search();
       });
     },
     add() {
       this.$refs.dialog.isShow = true;
-      this.meta = 'add';
+      this.meta = "add";
     },
     edit(row) {
       this.$refs.dialog.isShow = true;
-      this.meta = 'edit';
+      this.meta = "edit_" + Date.now();
       this.formData = row;
-    },
-  },
+    }
+  }
 };
 </script>
 

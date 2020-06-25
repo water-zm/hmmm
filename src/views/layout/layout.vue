@@ -52,46 +52,62 @@
 </template>
 
 <script>
-import { getUserInfo, logout } from '@/api/layout.js';
-import { localRemove, localGet } from '@/utils/local.js';
+import { getUserInfo, logout } from "@/api/layout.js";
+import { localRemove, localGet } from "@/utils/local.js";
 export default {
   data() {
     return {
       baseUrl: process.env.VUE_APP_URL,
-      userInfo: '', // 用户信息
-      bol: false,
+      userInfo: "", // 用户信息
+      bol: false
     };
   },
   created() {
     // window.console.log("fullPath：", this.$route.fullPath);
     // window.console.log("path：", this.$route.path);
     if (!localGet()) {
-      this.$router.push('/');
+      this.$router.push("/");
       return;
     }
-    getUserInfo().then((res) => {
+    getUserInfo().then(res => {
       this.$store.state.userInfo = res.data;
+      this.$store.state.roleInit = this.$store.state.roleObj[res.data.role_id];
+      if (!this.$route.meta.roles.includes(res.data.role_id)) {
+        this.$message.error("你没有权限访问该页面，请重新登录");
+        localRemove();
+        this.$router.push("/");
+      }
+      if (res.data.status === 0) {
+        this.$message.error("此账号被禁用");
+        localRemove();
+        this.$router.push("/");
+      }
     });
   },
   methods: {
     exit() {
-      this.$confirm('此操作将退出账号, 是否继续?', '提示', {
-        confirmButtonText: '狠心离开',
-        cancelButtonText: '再逛逛看',
-        type: 'warning',
-        center: true,
-      }).then(() => {
-        logout().then(() => {
-          localRemove();
-          this.$router.push('/');
+      this.$confirm("此操作将退出账号, 是否继续?", "提示", {
+        confirmButtonText: "狠心离开",
+        cancelButtonText: "再逛逛看",
+        type: "warning",
+        center: true
+      })
+        .then(() => {
+          logout().then(() => {
+            localRemove();
+            this.$router.push("/");
+          });
+
+          this.$message({
+            type: "success",
+            message: "退出成功!"
+          });
+        })
+        .catch(() => {
+          this.$message.warning("取消退出");
         });
-        this.$message({
-          type: 'success',
-          message: '退出成功!',
-        });
-      });
-    },
-  },
+    }
+  }
 };
 </script>
 
