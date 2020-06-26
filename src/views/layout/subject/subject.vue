@@ -20,7 +20,7 @@
         <el-form-item label="学科编号">
           <el-button @click="search" type="primary">搜索</el-button>
           <el-button @click="reset">清除</el-button>
-          <el-button @click="add" type="primary">+新增学科</el-button>
+          <el-button v-if="$store.state.roleInit.includes('管理员')" @click="add" type="primary">+新增学科</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -56,7 +56,7 @@
         @size-change="changeSize"
         @current-change="changeCurrent"
         :current-page="pagination.page"
-        :page-sizes="[1,5, 10, 15, 20]"
+        :page-sizes="[3,5, 10, 15, 20]"
         :page-size="pagination.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="pagination.total"
@@ -85,7 +85,7 @@ export default {
         status: "" //状态
       },
       pagination: {
-        pageSize: 1, // 页尺寸
+        pageSize: 3, // 页尺寸
         page: 1, // 页码
         total: 5 // 总数
       }

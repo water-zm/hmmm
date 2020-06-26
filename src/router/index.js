@@ -45,6 +45,7 @@ const router = new VueRouter({
             component: dataOverview,
             meta: {
                 title: '数据概览',
+                icon: 'el-icon-pie-chart',
                 roles: ['超级管理员', '管理员', '老师']
             }
         }, {
@@ -52,6 +53,7 @@ const router = new VueRouter({
             component: userList,
             meta: {
                 title: '用户列表',
+                icon: 'el-icon-user',
                 roles: ['超级管理员', '管理员']
             }
         }, {
@@ -59,6 +61,7 @@ const router = new VueRouter({
             component: question,
             meta: {
                 title: '题库列表',
+                icon: 'el-icon-edit-outline',
                 roles: ['超级管理员', '管理员', '老师']
             }
         }, {
@@ -66,6 +69,7 @@ const router = new VueRouter({
             component: company,
             meta: {
                 title: '企业列表',
+                icon: 'el-icon-office-building',
                 roles: ['超级管理员', '管理员', '老师']
             }
         }, {
@@ -73,6 +77,7 @@ const router = new VueRouter({
             component: subject,
             meta: {
                 title: '学科列表',
+                icon: 'el-icon-notebook-2',
                 roles: ['超级管理员', '管理员', '老师', '学生']
             }
         }]

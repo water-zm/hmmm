@@ -22,11 +22,16 @@
           :collapse="bol"
           class="el-menu-vertical-demo"
         >
-          <el-menu-item index="/layout/dataOverview">
-            <i class="el-icon-pie-chart"></i>
-            <span slot="title">数据概览</span>
+          <el-menu-item
+            v-for="(item, index) in $router.options.routes[2].children"
+            :key="index"
+            :index="'/layout/'+item.path"
+            v-show="item.meta.roles.includes($store.state.roleInit)"
+          >
+            <i :class="item.meta.icon"></i>
+            <span slot="title">{{item.meta.title}}</span>
           </el-menu-item>
-          <el-menu-item index="/layout/userList">
+          <!-- <el-menu-item index="/layout/userList">
             <i class="el-icon-user"></i>
             <span slot="title">用户列表</span>
           </el-menu-item>
@@ -41,7 +46,7 @@
           <el-menu-item index="/layout/subject">
             <i class="el-icon-notebook-2"></i>
             <span slot="title">学科列表</span>
-          </el-menu-item>
+          </el-menu-item>-->
         </el-menu>
       </el-aside>
       <el-main class="main">

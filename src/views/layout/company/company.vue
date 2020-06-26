@@ -59,7 +59,7 @@
         @size-change="sizeChange"
         @current-change="currentChange"
         :current-page="pagination.page"
-        :page-sizes="[1, 5, 10, 15, 20]"
+        :page-sizes="[3, 5, 10, 15, 20]"
         :page-size="pagination.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="pagination.total"
@@ -70,7 +70,7 @@
     <companyDialog
       ref="comDia"
       @search="search"
-      @getData="getData"
+      @getList="getList"
       :meta="meta"
       :formData="formData"
     ></companyDialog>
@@ -98,7 +98,7 @@ export default {
       pagination: {
         page: 1, // 当前页
         total: 5, // 总数
-        pageSize: 1 // 页尺寸
+        pageSize: 3 // 页尺寸
       },
       meta: "add",
       formData: ""
