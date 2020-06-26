@@ -1,6 +1,6 @@
 <template>
   <el-dialog :visible.sync="isShow" class="companyDialog" width="600px">
-    <div slot="title" class="dialog-title">{{meta=='add'?'新增':'编辑'}}企业</div>
+    <div slot="title" class="dialog-title">{{ meta == 'add' ? '新增' : '编辑' }}企业</div>
     <el-form ref="form" :model="form" :rules="rules" label-width="80px">
       <el-form-item prop="eid" label="企业编号">
         <el-input v-model="form.eid"></el-input>
@@ -19,7 +19,7 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="isShow=false">取消</el-button>
+      <el-button @click="isShow = false">取消</el-button>
       <el-button @click="submit" type="primary">确定</el-button>
     </div>
   </el-dialog>
@@ -66,11 +66,11 @@ export default {
               this.isShow = false;
               this.$emit("search");
             });
-          } else if (this.meta == "edit") {
+          } else {
             companyEdit(this.form).then(() => {
               this.$message.success("编辑企业成功");
               this.isShow = false;
-              this.$emit("search");
+              this.$emit("getData");
             });
           }
         }
@@ -91,7 +91,15 @@ export default {
       }
     },
     meta(newVal) {
-      if (newVal == "edit") {
+      if (newVal == "add") {
+        this.form = {
+          eid: "", // 企业编号
+          name: "", // 企业名称
+          short_name: "", // 简称
+          intro: "", // 企业简介
+          remark: "" // 备注
+        };
+      } else {
         this.form = JSON.parse(JSON.stringify(this.formData));
       }
     }

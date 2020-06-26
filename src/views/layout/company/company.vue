@@ -27,7 +27,11 @@
     <el-card>
       <el-table :data="list">
         <el-table-column label="序号" width="100">
-          <template v-slot="scope">{{scope.$index+1}}</template>
+          <template v-slot="scope">
+            {{
+            pagination.pageSize * (pagination.page - 1) + scope.$index + 1
+            }}
+          </template>
         </el-table-column>
         <el-table-column prop="eid" label="企业编号" width="180"></el-table-column>
         <el-table-column prop="name" label="企业名称"></el-table-column>
@@ -35,7 +39,7 @@
         <el-table-column prop="create_time" label="创建日期"></el-table-column>
         <el-table-column prop="status" label="状态">
           <template v-slot="scope">
-            <span v-if="scope.row.status==1">启用</span>
+            <span v-if="scope.row.status == 1">启用</span>
             <span v-else style="color:red">禁用</span>
           </template>
         </el-table-column>
@@ -46,7 +50,7 @@
               @click="changeStatus(scope.row.id)"
               type="primary"
               class="btn"
-            >{{scope.row.status==1?'禁用':'启用'}}</el-link>
+            >{{ scope.row.status == 1 ? '禁用' : '启用' }}</el-link>
             <el-link @click="remove(scope.row.id)" type="primary" class="btn">删除</el-link>
           </template>
         </el-table-column>
@@ -55,7 +59,7 @@
         @size-change="sizeChange"
         @current-change="currentChange"
         :current-page="pagination.page"
-        :page-sizes="[1,5, 10, 15, 20]"
+        :page-sizes="[3, 5, 10, 15, 20]"
         :page-size="pagination.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="pagination.total"
@@ -63,7 +67,13 @@
         class="page"
       ></el-pagination>
     </el-card>
-    <companyDialog ref="comDia" @search="search" :meta="meta" :formData="formData"></companyDialog>
+    <companyDialog
+      ref="comDia"
+      @search="search"
+      @getList="getList"
+      :meta="meta"
+      :formData="formData"
+    ></companyDialog>
   </div>
 </template>
 
@@ -88,7 +98,7 @@ export default {
       pagination: {
         page: 1, // 当前页
         total: 5, // 总数
-        pageSize: 1 // 页尺寸
+        pageSize: 3 // 页尺寸
       },
       meta: "add",
       formData: ""
@@ -115,8 +125,7 @@ export default {
     },
     sizeChange(size) {
       this.pagination.pageSize = size;
-      this.pagination.page = 1;
-      this.getList();
+      this.search();
     },
     currentChange(val) {
       this.pagination.page = val;
@@ -148,7 +157,7 @@ export default {
     },
     edit(row) {
       this.$refs.comDia.isShow = true;
-      this.meta = "edit";
+      this.meta = "edit_" + Date.now();
       this.formData = row;
     }
   }
