@@ -15,3 +15,27 @@ export function setStatus(data) {
         data,
     })
 }
+// 删除设置
+export function removeQuestion(data) {
+    return instance({
+        url: '/question/remove',
+        method: 'post',
+        data,
+    })
+}
+// 发布题目
+export function addQuestion(data) {
+    return instance({
+        url: '/question/add',
+        method: 'post',
+        data,
+    })
+}
+// 编辑题目
+export function editQuestion(data) {
+    return instance({
+        url: '/question/edit',
+        method: 'post',
+        data,
+    })
+}

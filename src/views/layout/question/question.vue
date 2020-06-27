@@ -84,11 +84,7 @@
           </el-col>
           <el-col :span="5">
             <el-form-item prop="create_date" label="日期">
-              <el-date-picker
-                v-model="form.create_date"
-                type="date"
-                placeholder="选择日期"
-              ></el-date-picker>
+              <el-date-picker v-model="form.create_date" type="date" placeholder="选择日期"></el-date-picker>
             </el-form-item>
           </el-col>
         </el-row>
@@ -119,11 +115,11 @@
           </template>
         </el-table-column>
         <el-table-column label="学科--阶段">
-          <template v-slot="scope"
-            >{{ scope.row.subject_name }}--{{
-              stepObj[scope.row.step]
-            }}</template
-          >
+          <template v-slot="scope">
+            {{ scope.row.subject_name }}--{{
+            stepObj[scope.row.step]
+            }}
+          </template>
         </el-table-column>
         <el-table-column label="题型">
           <template v-slot="scope">{{ typeObj[scope.row.type] }}</template>
@@ -139,11 +135,13 @@
         <el-table-column label="访问量" prop="reads"></el-table-column>
         <el-table-column label="状态">
           <template v-slot="scope">
-            <el-link class="btn" type="primary">编辑</el-link>
-            <el-link @click="status(scope.row.id)" class="btn" type="primary">{{
+            <el-link @click="edit(scope.row)" class="btn" type="primary">编辑</el-link>
+            <el-link @click="status(scope.row.id)" class="btn" type="primary">
+              {{
               scope.row.status == 1 ? '禁用' : '启用'
-            }}</el-link>
-            <el-link class="btn" type="primary">删除</el-link>
+              }}
+            </el-link>
+            <el-link @click="remove(scope.row.id)" class="btn" type="primary">删除</el-link>
           </template>
         </el-table-column>
       </el-table>
@@ -166,66 +164,68 @@
       :companyList="companyList"
       :typeObj="typeObj"
       :diffObj="diffObj"
+      @search="search"
+      @getData="getData"
     ></questionAdd>
   </div>
 </template>
 
 <script>
-import questionAdd from './questionAdd';
-import { getSubjectList } from '@/api/subject';
-import { getCompanyList } from '@/api/company';
-import { getQusetionList, setStatus } from '@/api/question';
+import questionAdd from "./questionAdd";
+import { getSubjectList } from "@/api/subject";
+import { getCompanyList } from "@/api/company";
+import { getQusetionList, setStatus, removeQuestion } from "@/api/question";
 export default {
   components: {
-    questionAdd,
+    questionAdd
   },
   data() {
     return {
       form: {
-        subject: '', // int	学科id
-        step: '', // string	题目阶段:1(初级),2(中级),3(高级)
-        enterprise: '', // int	企业id
-        type: '', // int	题目类型:1(单选),2(多选),3(简答)
-        difficulty: '', // int	题目难度: 1(简单),2(一般),3(困难)
-        username: '', // string	作者
-        status: '', // int	状态:0(禁用),1(启用)
-        create_date: '', // string	创建日期
-        title: '', // string	标题名称
+        subject: "", // int	学科id
+        step: "", // string	题目阶段:1(初级),2(中级),3(高级)
+        enterprise: "", // int	企业id
+        type: "", // int	题目类型:1(单选),2(多选),3(简答)
+        difficulty: "", // int	题目难度: 1(简单),2(一般),3(困难)
+        username: "", // string	作者
+        status: "", // int	状态:0(禁用),1(启用)
+        create_date: "", // string	创建日期
+        title: "" // string	标题名称
       },
       pagination: {
         page: 1,
         pageSize: 3,
-        total: 5,
+        total: 5
       },
       subjectList: [], // 学科列表
       companyList: [], // 企业列表
       list: [], // 题目列表
       stepObj: {
-        1: '初级',
-        2: '中级',
-        3: '高级',
+        1: "初级",
+        2: "中级",
+        3: "高级"
       },
       typeObj: {
-        1: '单选',
-        2: '多选',
-        3: '简答',
+        1: "单选",
+        2: "多选",
+        3: "简答"
       },
       diffObj: {
-        1: '简单',
-        2: '一般',
-        3: '困难',
+        1: "简单",
+        2: "一般",
+        3: "困难"
       },
       statusObj: {
-        0: '启用',
-        1: '禁用',
-      },
+        0: "启用",
+        1: "禁用"
+      }
     };
   },
   created() {
-    getSubjectList({ limit: 100 }).then((res) => {
+    getSubjectList({ limit: 100 }).then(res => {
       this.subjectList = res.data.items;
     });
-    getCompanyList({ limit: 100 }).then((res) => {
+    getCompanyList({ limit: 100 }).then(res => {
       this.companyList = res.data.items;
     });
     this.getData();
@@ -236,9 +236,13 @@ export default {
       let _params = {
         ...this.form,
         page: this.pagination.page,
-        limit: this.pagination.pageSize,
+        limit: this.pagination.pageSize
       };
-      getQusetionList(_params).then((res) => {
+      getQusetionList(_params).then(res => {
+        res.data.items.forEach(item => {
+          item.city = item.city.split(",");
+          item.multiple_select_answer = item.multiple_select_answer.split(",");
+        });
         this.list = res.data.items;
         this.pagination.total = res.data.pagination.total;
         window.console.log(this.list);
@@ -267,15 +271,29 @@ export default {
     // 修改状态
     status(id) {
       setStatus({ id }).then(() => {
-        this.$message.success('修改状态成功');
+        this.$message.success("修改状态成功");
         this.getData();
       });
     },
     // 新增
     add() {
       this.$refs.queAdd.isShow = true;
+      this.$refs.queAdd.meta = "add";
     },
-  },
+    // 编辑
+    edit(row) {
+      this.$refs.queAdd.isShow = true;
+      this.$refs.queAdd.meta = "edit_" + Date.now();
+      this.$refs.queAdd.form = JSON.parse(JSON.stringify(row));
+    },
+    // 删除
+    remove(id) {
+      removeQuestion({ id }).then(() => {
+        this.$message.success("删除成功");
+        this.search();
+      });
+    }
+  }
 };
 </script>
 
